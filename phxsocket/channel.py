@@ -25,17 +25,20 @@ class Channel:
     self.on_close = None
     self.events = {}
 
-  def join(self) -> Union[dict, list, str, int, float, bool]:
+  def join(self, reply=True) -> Union[dict, list, str, int, float, bool]:
     join = self.socket.push(self.topic,
                             ChannelEvents.join,
                             self.params,
-                            reply=True)
+                            reply=reply)
 
-    response = join.wait_for_response()
-    if response["status"] != "ok":
-      raise ChannelConnectError(response["response"])
+    if reply:
+      response = join.wait_for_response()
+      if response["status"] != "ok":
+        raise ChannelConnectError(response["response"])
 
-    return response["response"]
+      return response["response"]
+
+    return None
 
   def leave(self) -> Tuple[bool, Union[dict, list, str, int, float, bool]]:
     leave = self.socket.push(self.topic,
