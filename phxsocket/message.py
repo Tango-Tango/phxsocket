@@ -9,8 +9,8 @@ class Message(typing.NamedTuple):
   ref: int
 
   @classmethod
-  def from_json(cls, msg):
-    msg = json.loads(msg)
+  def from_json(cls, msg, decode_function=json.loads):
+    msg = decode_function(msg)
     return cls(msg["event"], msg["topic"], msg["payload"], msg["ref"])
 
 

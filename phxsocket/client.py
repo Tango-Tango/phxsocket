@@ -58,6 +58,9 @@ class Client:
 
     self.thread = None
 
+    self.encode_function = json.dumps
+    self.decode_function = json.loads
+
     self._send_queue = None
 
   def set_params(self, params: dict = {}, url: str = None) -> None:
@@ -148,7 +151,7 @@ class Client:
       return connect_evt
 
   def _on_message(self, _message):
-    message = Message.from_json(_message)
+    message = Message.from_json(_message, self.decode_function)
 
     if message.event == ChannelEvents.reply.value and message.ref in self.messages:
       self.messages[message.ref].respond(message.payload)
@@ -181,7 +184,7 @@ class Client:
       ref = self._ref
       self._ref += 1
 
-    message = json.dumps({
+    message = self.encode_function({
       "event": event,
       "topic": topic,
       "ref": ref,
